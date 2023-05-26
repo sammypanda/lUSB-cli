@@ -1,6 +1,8 @@
 extern crate libusb;
 use std::time::Duration;
 
+const ID_ENGLISH: u16 = 1033; // the language code for US English
+
 fn main() {
     let context = libusb::Context::new().unwrap(); // instantiate a libusb context
 
@@ -10,6 +12,7 @@ fn main() {
     for device in context.devices().unwrap().iter() {
         let device_desc = device.device_descriptor().unwrap(); // translate the device description from <Result>
         let device_handle; // allows us to access extra deets
+        let device_string;
 
         // open device for handle with consideration that it might be empty
         match device.open() { 
@@ -26,21 +29,26 @@ fn main() {
         
         let device_languages = device_handle.read_languages( // dependency for reading string descriptors
             Duration::new(30, 0) // timeout after 30 seconds, 0 nanoseconds 
-        ).unwrap(); 
+        ).unwrap();
 
-        for each in &device_languages {
-            println!("{}", each.lang_id());
-        }
-
-        println!("Bus {} Device {} ID {}:{} (n/a)",
+        device_string = device_languages.iter() // convert Vec to Iter to check if our language exists in
+        .find(|language| language.lang_id() == ID_ENGLISH) // pass `language` parameter to represent `Some` value and get the `Language` id
+        .and_then(|language| { // operation to be performed on `Some` value returned by `find()`
+            device_handle.read_product_string(language.clone(), &device_desc, Duration::new(30, 0)) // get the product string
+            .map_err(|error| error.to_string()) // if there is an error
+            .ok() // convert `Result` into `Option<String>` 
+        })
+        .unwrap_or_else(|| { // unwrapping `Option<String>` but with an `else` for...
+            // handling the case when the desired language is not found
+            String::from("Language not found")
+        });
+        
+        println!("Bus {} Device {} ID {}:{} ({})",
             device.bus_number(),
             device.address(),
             device_desc.vendor_id(),
             device_desc.product_id(),
-            // device_handle.read_product_string(
-            //     lang_id,
-            //     device_desc
-            // )
+            device_string
         );
     }
 }
