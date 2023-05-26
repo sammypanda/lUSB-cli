@@ -14,10 +14,11 @@ fn main() {
         // open device for handle with consideration that it might be empty
         match device.open() { 
             Ok(result) => device_handle = result,
-            Err(_error) => {
-                println!("Bus {}, Device {} - unused: no further work :)",
+            Err(error) => {
+                println!("Bus {}, Device {} - {}",
                     device.bus_number(),
-                    device.address()
+                    device.address(),
+                    error
                 );
                 continue;
             }
