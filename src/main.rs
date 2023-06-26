@@ -1,15 +1,14 @@
-extern crate libusb;
+extern crate rusb;
 use std::time::Duration;
 
 const ID_ENGLISH: u16 = 1033; // the language code for US English
 
 fn main() {
-    let context = libusb::Context::new().unwrap(); // instantiate a libusb context
 
     //
     // translate devices from <Result> and iterate over
     //
-    for device in context.devices().unwrap().iter() {
+    for device in rusb::devices().unwrap().iter() {
         let device_desc = device.device_descriptor().unwrap(); // translate the device description from <Result>
         let device_handle; // allows us to access extra deets
         let device_string;
