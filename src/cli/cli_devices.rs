@@ -52,7 +52,7 @@ pub fn list() {
     cli_devices_list::demo();
 }
 
-pub fn handle_verb(action: &str, device: &Device) {
+pub fn handle_verb(verb: &str, device: &Device) {
     let device_handle = device.get_device_handle();
 
     println!("Device: {:?}", device.get_index().unwrap());
@@ -66,15 +66,15 @@ pub fn handle_verb(action: &str, device: &Device) {
             .product_id()
     );
 
-    match action {
+    match verb {
         "enable" => {
-            // Handle "enable" action
+            // Handle "enable" verb
         }
         "disable" => {
-            // Handle "disable" action
+            // Handle "disable" verb
         }
         _ => {
-            panic!("Invalid action, use disable or enable");
+            panic!("Invalid verb, use disable or enable");
         }
     }
 }
