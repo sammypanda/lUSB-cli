@@ -1,4 +1,5 @@
 use clap::{Command, Arg};
+use core::iter::Iterator;
 
 mod cli;
 use cli::cli_devices; // should basically be the proxy for every other *_devices_* module
@@ -21,32 +22,43 @@ fn main() {
                         .required(true)
                         .help("Comma-separated list of identifiers")
                 )
-        ).get_matches();
+            )
+        .subcommand(
+            Command::new("enable")
+                .about("Enable the specified USB devices")
+                .arg(
+                    Arg::new("identifiers")
+                        .value_name("IDENTIFIERS")
+                        .required(true)
+                        .help("Comma-separated list of identifiers")
+                )
+            )
+        .get_matches();
 
     match cmd.subcommand() {
         Some(("list", _)) => {
             cli_devices::list();
         },
-        Some(("disable", sub_m)) => {
-            let identifier_list = match sub_m.get_one::<String>("identifiers") {
-                Some(value) => value
-                    .split(',') // turn into comma separated list
-                    .map(|attempt| attempt.parse::<u8>().ok()) // convert to u8
-                    .filter_map(|result| result) // remove non-u8
-                    .collect(),
-                None => Vec::new(),
+        Some((verb, sub_m)) => {
+            let device_list = match sub_m.get_one::<String>("identifiers") {
+                Some(value) => device_iter(value),
+                None => panic!("Missing list of identifiers"),
             };
 
-            println!("devices found: {:?}", identifier_list);
-
-            let device_list = identifier_list
-                .into_iter() // iter() is reference to; into_iter() changes type
-                .map(|compatible| cli::cli_devices::Device::new(compatible)); // create instances for each cli_device
-
             for device in device_list {
-                println!("Device: {:?}", device.get_index().unwrap());
-            }
-        }
+                cli_devices::handle_verb(verb, &device)
+            };
+        },
         _ => {} // required by 'match'
+    };
+
+    fn device_iter(list: &String) -> impl Iterator<Item = cli_devices::Device> + '_ {
+        // filter the comma-separated string
+        return list
+            .split(',') // turn into comma-separated list
+            .map(|attempt| attempt.parse::<u8>().ok()) // convert to u8
+            .filter_map(|result| result) // remove non-u8
+            .into_iter()
+            .map(|compatible| cli::cli_devices::Device::new(compatible)); // create instances for each cli_device
     }
 }

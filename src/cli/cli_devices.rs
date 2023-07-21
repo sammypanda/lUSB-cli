@@ -51,3 +51,30 @@ impl Device {
 pub fn list() {
     cli_devices_list::demo();
 }
+
+pub fn handle_verb(action: &str, device: &Device) {
+    let device_handle = device.get_device_handle();
+
+    println!("Device: {:?}", device.get_index().unwrap());
+    println!(
+        "device_handle: {}",
+        device_handle
+            .unwrap()
+            .device()
+            .device_descriptor()
+            .unwrap()
+            .product_id()
+    );
+
+    match action {
+        "enable" => {
+            // Handle "enable" action
+        }
+        "disable" => {
+            // Handle "disable" action
+        }
+        _ => {
+            panic!("Invalid action, use disable or enable");
+        }
+    }
+}
