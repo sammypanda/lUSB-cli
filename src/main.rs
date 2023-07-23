@@ -4,6 +4,7 @@ use core::iter::Iterator;
 mod cli;
 use cli::cli_devices; // should basically be the proxy for every other *_devices_* module
 
+// responsible for parsing command inputs and delegating tasks
 fn main() {
     let cmd = Command::new(env!("CARGO_PKG_NAME"))
         .arg_required_else_help(true)
