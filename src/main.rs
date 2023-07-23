@@ -6,6 +6,11 @@ use cli::cli_devices; // should basically be the proxy for every other *_devices
 
 // responsible for parsing command inputs and delegating tasks
 fn main() {
+    let identifiers_arg: Arg = Arg::new("identifiers")
+        .value_name("IDENTIFIERS")
+        .required(true)
+        .help("Comma-separated list of identifiers");
+
     let cmd = Command::new(env!("CARGO_PKG_NAME"))
         .arg_required_else_help(true)
         .version(env!("CARGO_PKG_VERSION", "Version not set"))
@@ -18,20 +23,14 @@ fn main() {
             Command::new("disable")
                 .about("Disable the specified USB devices")
                 .arg(
-                    Arg::new("identifiers")
-                        .value_name("IDENTIFIERS")
-                        .required(true)
-                        .help("Comma-separated list of identifiers")
+                    &identifiers_arg
                 )
             )
         .subcommand(
             Command::new("enable")
                 .about("Enable the specified USB devices")
                 .arg(
-                    Arg::new("identifiers")
-                        .value_name("IDENTIFIERS")
-                        .required(true)
-                        .help("Comma-separated list of identifiers")
+                    &identifiers_arg
                 )
             )
         .get_matches();
