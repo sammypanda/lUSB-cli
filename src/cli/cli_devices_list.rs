@@ -7,6 +7,8 @@ const ID_ENGLISH: u16 = 1033; // the language code for US English
 // translate devices from <Result> and iterate over
 //
 pub fn demo() {
+    let mut index = 0;
+
     for device in rusb::devices().unwrap().iter() {
         let device_desc = device.device_descriptor().unwrap(); // translate the device description from <Result>
         let device_handle; // allows us to access extra deets
@@ -41,12 +43,15 @@ pub fn demo() {
             String::from("Language not found")
         });
 
-        println!("Bus {} Device {} ID {}:{} ({})",
+        println!("{} - Bus {} Device {} ID {}:{} ({})",
+            index,
             device.bus_number(),
             device.address(),
             device_desc.vendor_id(),
             device_desc.product_id(),
             device_string
         );
+
+        index += 1;
     }
 }
