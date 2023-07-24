@@ -52,13 +52,15 @@ fn main() {
         _ => {} // required by 'match'
     };
 
-    fn device_iter(list: &String) -> impl Iterator<Item = cli_devices::Device> + '_ {
-        // filter the comma-separated string
-        return list
-            .split(',') // turn into comma-separated list
-            .map(|attempt| attempt.parse::<u8>().ok()) // convert to u8
-            .filter_map(|result| result) // remove non-u8
-            .into_iter()
-            .map(|compatible| cli::cli_devices::Device::new(compatible)); // create instances for each cli_device
+    fn device_iter(list: &str) -> impl Iterator<Item = cli_devices::Device> + '_ {
+        list
+            .split(',')
+            .filter_map(|attempt| {
+                if let Ok(compatible) = attempt.parse::<u8>() {
+                    Some(cli::cli_devices::Device::new(compatible))
+                } else {
+                    None
+                }
+            })
     }
 }
