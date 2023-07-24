@@ -53,7 +53,7 @@ fn main() {
     };
 
     fn device_iter(list: &str) -> impl Iterator<Item = cli_devices::Device> + '_ {
-        list
+        list // filter the comma-separated string
             .split(',')
             .filter_map(|attempt| {
                 if let Ok(compatible) = attempt.parse::<u8>() {
