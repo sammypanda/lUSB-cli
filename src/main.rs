@@ -1,5 +1,4 @@
 use clap::{Command, Arg};
-use core::iter::Iterator;
 
 mod cli;
 use cli::cli_devices; // should basically be the proxy for every other *_devices_* module
@@ -9,6 +8,8 @@ fn main() {
     let identifiers_arg: Arg = Arg::new("identifiers")
         .value_name("IDENTIFIERS")
         .required(true)
+        .value_delimiter(',')
+        .value_parser(clap::value_parser!(u8))
         .help("Comma-separated list of identifiers");
 
     let cmd = Command::new(env!("CARGO_PKG_NAME"))
@@ -32,35 +33,22 @@ fn main() {
                 .arg(
                     &identifiers_arg
                 )
-            )
-        .get_matches();
+            );
 
-    match cmd.subcommand() {
+    let cmd_result = cmd.clone().get_matches();
+
+    match cmd_result.subcommand() {
         Some(("list", _)) => {
             cli_devices::list();
         },
         Some((verb, sub_m)) => {
-            let device_list = match sub_m.get_one::<String>("identifiers") {
-                Some(value) => device_iter(value),
-                None => panic!("Missing list of identifiers"),
-            };
+            let identifiers = sub_m.get_many::<u8>("identifiers") // we can be sure it exists since `clap` handles parsing
+                .unwrap_or_else(|| panic!("Comma-separted identifiers not found")); // ..but just in case
 
-            for device in device_list {
-                cli_devices::handle_verb(verb, &device)
+            for device in identifiers {
+                cli_devices::handle_verb(verb, &cli::cli_devices::Device::new(*device))
             };
         },
         _ => {} // required by 'match'
     };
-
-    fn device_iter(list: &str) -> impl Iterator<Item = cli_devices::Device> + '_ {
-        list // filter the comma-separated string
-            .split(',')
-            .filter_map(|attempt| {
-                if let Ok(compatible) = attempt.parse::<u8>() {
-                    Some(cli::cli_devices::Device::new(compatible))
-                } else {
-                    None
-                }
-            })
-    }
 }
