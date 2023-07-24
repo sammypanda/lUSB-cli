@@ -33,11 +33,10 @@ fn main() {
                 .arg(
                     &identifiers_arg
                 )
-            );
+            )
+        .get_matches();
 
-    let cmd_result = cmd.clone().get_matches();
-
-    match cmd_result.subcommand() {
+    match cmd.subcommand() {
         Some(("list", _)) => {
             cli_devices::list();
         },
