@@ -53,18 +53,22 @@ pub fn list() {
 }
 
 pub fn handle_verb(verb: &str, device: &Device) {
-    let device_handle = device.get_device_handle();
-
-    println!("Device: {:?}", device.get_index().unwrap());
-    println!(
-        "device_handle: {}",
-        device_handle
-            .unwrap()
-            .device()
-            .device_descriptor()
-            .unwrap()
-            .product_id()
-    );
+    match device.get_device_handle() {
+        Ok(device_handle) => {
+            println!("Device: {:?}", device.get_index().unwrap());
+            println!(
+                "device_handle: {}",
+                device_handle
+                .device()
+                .device_descriptor()
+                .unwrap()
+                .product_id()
+            );
+        },
+        Err(error) => {
+            eprintln!("{error}");
+        }
+    }
 
     match verb {
         "enable" => {
