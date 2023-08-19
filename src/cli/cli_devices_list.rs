@@ -18,7 +18,7 @@ pub fn demo() {
         match device.open() {
             Ok(result) => device_handle = result,
             Err(error) => {
-                println!("Bus {}, Device {} - {}",
+                println!("\u{274C} - Bus {}, Device {}: {}", // 2A2F is a ⨯ (cross product) unicode symbol
                     device.bus_number(),
                     device.address(),
                     error
