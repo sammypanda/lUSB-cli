@@ -7,7 +7,7 @@ const ID_ENGLISH: u16 = 1033; // the language code for US English
 // translate devices from <Result> and iterate over
 //
 pub fn demo() {
-    let mut index = 1;
+    let mut index = 0;
 
     for device in rusb::devices().unwrap().iter() {
         let device_desc = device.device_descriptor().unwrap(); // translate the device description from <Result>
