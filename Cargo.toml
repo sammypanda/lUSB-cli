@@ -1,0 +1,10 @@
+[package]
+name = "lusb-cli"
+description = "linUxSwitchBoard (command-line interface): Virtual switchboard for your USB devices"
+authors = ["sammypanda"]
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = "4.3.10"
+rusb = "0.9"
