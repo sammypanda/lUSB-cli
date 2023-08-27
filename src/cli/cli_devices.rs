@@ -17,7 +17,7 @@ impl Device {
     pub fn get_index(&self) -> Result<u8, Error> {
         Ok(self.index)
     }
-    
+
     pub fn get_device_handle(&self) -> Result<DeviceHandle<Context>, Error> {
         let index = self.index;
         let context = Context::new().unwrap();
@@ -64,28 +64,13 @@ pub fn handle_verb(verb: &str, device: &Device) {
                 .unwrap()
                 .product_id()
             );
-            
+
             match verb {
                 "enable" => {
-                    // Handle "enable" verb
+                    interface_loop(&mut device_handle, true)
                 }
                 "disable" => {
-                    // TODO: actually get the correct interface instead of "0", might have to
-                        // -- according to my research most USB devices will just have the one, so 0 is correct, but... 
-                        //
-                        // get device()
-                        // get device config_descriptor()
-                        // unpack result/err
-                        // get configdescriptor interfaces()
-                        // .Iter interfaces so it -> interface
-                        // interface num
-                        // .. uncommented code cont, replace 0 with var for iter ..
-                        //
-                        // something like: device_handle.device().active_config_descriptor().unwrap().interfaces.count()
-                        // (but with an iter instead of the count thing)
-                        //
-                    device_handle.claim_interface(0);
-                    device_handle.detach_kernel_driver(0).unwrap_or_else(|error| println!("{error}"));
+                    interface_loop(&mut device_handle, false)
                 }
                 _ => {
                     panic!("Invalid verb, use disable or enable");
@@ -96,4 +81,16 @@ pub fn handle_verb(verb: &str, device: &Device) {
             eprintln!("{error}");
         }
     };
+}
+
+fn interface_loop<T: UsbContext>(device_handle: &mut DeviceHandle<T>, enable: bool) {
+    device_handle.device().active_config_descriptor().unwrap().interfaces().enumerate().for_each(|(index, interface)| {
+        let index = index as u8;
+
+        if enable {
+            device_handle.attach_kernel_driver(index).unwrap_or_else(|error| println!("{error}"));
+        } else {
+            device_handle.detach_kernel_driver(index).unwrap_or_else(|error| println!("{error}"));
+        }
+    });
 }
