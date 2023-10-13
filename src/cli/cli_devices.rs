@@ -84,7 +84,7 @@ pub fn handle_verb(verb: &str, device: &Device) {
 }
 
 fn interface_loop<T: UsbContext>(device_handle: &mut DeviceHandle<T>, enable: bool) {
-    device_handle.device().active_config_descriptor().unwrap().interfaces().enumerate().for_each(|(index, interface)| {
+    device_handle.device().active_config_descriptor().unwrap().interfaces().enumerate().for_each(|(index, _interface)| {
         let index = index as u8;
 
         if enable {

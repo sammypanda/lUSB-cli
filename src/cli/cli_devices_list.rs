@@ -43,7 +43,7 @@ pub fn demo() {
             String::from("Language not found")
         });
 
-        println!("{}  - Bus {} Device {} ID {}:{} ({})",
+        println!("{}  - Bus {} Device {} ID {:04x}:{:04x} ({})",
             index,
             device.bus_number(),
             device.address(),
